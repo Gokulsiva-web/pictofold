@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PictoFold Authentication Guide</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #475569;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --accent: #3b82f6;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--bg);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-bottom: 40px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        h1 {
+            font-size: 3em;
+            color: var(--primary);
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: var(--secondary);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            color: var(--primary);
+            font-size: 1.8em;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .visual-container {
+            width: 100%;
+            height: 300px;
+            background-color: #f1f5f9;
+            border-radius: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .visual-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .step-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .step-list li {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        .step-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .tag.secure { background: #dcfce7; color: #166534; }
+        .tag.fast { background: #dbeafe; color: #1e40af; }
+        .tag.locked { background: #fee2e2; color: #991b1b; }
+
+        footer {
+            text-align: center;
+            color: var(--secondary);
+            margin-top: 60px;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2em; }
+            .card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>PictoFold Security</h1>
+        <div class="subtitle">A Visual Guide to Your Backend Authentication System</div>
+    </header>
+
+    <!-- SECTION 1: SIGNUP & VERIFICATION -->
+    <div class="card">
+        <h2>1. Identity Verification</h2>
+        <p>We don't let just anyone in. When a user signs up, we need to know they are real.</p>
+        
+        <div class="visual-container">
+            <img src="email_otp.png" alt="Email OTP Illustration">
+        </div>
+
+        <h3>How it works:</h3>
+        <ul class="step-list">
+            <li>User enters their email address.</li>
+            <li>System generates a <strong>6-digit secure code</strong>.</li>
+            <li>This code is sent instantly to their inbox.</li>
+            <li>The user has <strong>10 minutes</strong> to enter the code.</li>
+        </ul>
+        <p><span class="tag locked">Security</span> If they guess wrong 5 times, the account is locked.</p>
+    </div>
+
+    <!-- SECTION 2: SECURE LOGIN -->
+    <div class="card">
+        <h2>2. The Digital Key Card (JWT)</h2>
+        <p>Once verified, users don't want to log in every time they click a button. We use <strong>JWT (JSON Web Tokens)</strong>.</p>
+
+        <div class="visual-container">
+            <img src="secure_login.png" alt="Secure Login Gateway">
+        </div>
+
+        <h3>The "Hotel Key" Analogy:</h3>
+        <p>Think of your backend as a secure hotel.</p>
+        <ul class="step-list">
+            <li><strong>Login</strong> is the Front Desk check-in.</li>
+            <li><strong>The Token</strong> is the plastic key card they give you.</li>
+            <li><strong>Requests</strong> are you using the key card to open your room, the gym, or the pool.</li>
+        </ul>
+        <p><span class="tag fast">Fast</span> The server doesn't need to remember you; the key card does the work.</p>
+    </div>
+
+    <!-- SECTION 3: DATA PROTECTION -->
+    <div class="card">
+        <h2>3. Iron-Clad Storage</h2>
+        <p>What if a hacker steals the database? It wouldn't matter.</p>
+
+        <div class="visual-container">
+            <img src="secure_db.png" alt="Encrypted Database">
+        </div>
+
+        <h3>Encryption Standards:</h3>
+        <ul class="step-list">
+            <li><strong>Passwords</strong> are hashed using <strong>BCrypt</strong>. It turns "password123" into a scrambled mess like <code>$2a$10$EixZa...</code>.</li>
+            <li><strong>OTPs</strong> are also hashed! Even the database administrator cannot see your verification code.</li>
+        </ul>
+        <p><span class="tag secure">Safe</span> Impossible to reverse-engineer the original passwords.</p>
+    </div>
+
+    <footer>
+        <p>Generated for PictoFold Project • 2025</p>
+    </footer>
+</div>
+
+</body>
+</html>
