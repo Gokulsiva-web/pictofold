@@ -27,11 +27,22 @@ export const authAPI = {
     verifyOTP: (otpData) => api.post('/auth/verify-otp', otpData),
     resendOTP: (email) => api.post('/auth/resend-otp', { email }),
     login: (credentials) => api.post('/auth/login', credentials),
+    forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
+    validateOTP: (otpData) => api.post('/auth/validate-otp', otpData),
+    resetPassword: (data) => api.post('/auth/reset-password', data),
 };
 
 // Protected API calls (example)
 export const protectedAPI = {
     getProfile: () => api.get('/test/protected'),
+};
+
+export const imageAPI = {
+    upload: (formData) => api.post('/images/upload', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    }),
 };
 
 export default api;

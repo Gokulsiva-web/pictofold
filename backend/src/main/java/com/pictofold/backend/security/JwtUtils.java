@@ -16,8 +16,8 @@ import java.util.function.Function;
 @Component
 public class JwtUtils {
 
-    // 256-bit key (32 bytes) - In production, store this in environment variables!
-    public static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
+    @org.springframework.beans.factory.annotation.Value("${jwt.secret}")
+    private String secret;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -66,7 +66,7 @@ public class JwtUtils {
     }
 
     private Key getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET);
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

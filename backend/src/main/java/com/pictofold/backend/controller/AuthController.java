@@ -62,4 +62,34 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", result));
         }
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody com.pictofold.backend.dto.ForgotPasswordRequest request) {
+        String result = authService.forgotPassword(request);
+        if ("OTP sent to your email".equals(result) || result.startsWith("If an account")) {
+            return ResponseEntity.ok(Map.of("success", true, "message", result));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", result));
+        }
+    }
+
+    @PostMapping("/validate-otp")
+    public ResponseEntity<?> validateOtp(@RequestBody com.pictofold.backend.dto.VerifyOtpRequest request) {
+        boolean isValid = authService.validateOtp(request.getEmail(), request.getOtp());
+        if (isValid) {
+            return ResponseEntity.ok(Map.of("success", true, "message", "OTP is valid"));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "Invalid or expired OTP"));
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody com.pictofold.backend.dto.ResetPasswordRequest request) {
+        String result = authService.resetPassword(request);
+        if ("Password reset successfully".equals(result)) {
+            return ResponseEntity.ok(Map.of("success", true, "message", result));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", result));
+        }
+    }
 }

@@ -175,6 +175,104 @@ public class AuthService {
         return "OTP resent successfully";
     }
 
+    // ------------------ FORGOT PASSWORD ------------------
+    public String forgotPassword(com.pictofold.backend.dto.ForgotPasswordRequest request) {
+        String email = request.getEmail().trim().toLowerCase();
+        User user = userRepository.findByEmail(email).orElse(null);
+
+        if (user == null) {
+            // For security, don't reveal if user exists. 
+            // But for this project, we might want to be explicit or just say "If email exists, OTP sent"
+            return "If an account exists with this email, an OTP has been sent.";
+        }
+
+        // Rate Limiting (reuse logic or separate)
+        if (user.getLastOtpSentAt() != null &&
+            user.getLastOtpSentAt().plus(RESEND_COOLDOWN_SECONDS, ChronoUnit.SECONDS).isAfter(Instant.now())) {
+            return "Please wait before requesting a new OTP.";
+        }
+
+        // Generate new OTP
+        String otp = generateOtp();
+        String otpHash = passwordEncoder.encode(otp);
+
+        user.setOtpHash(otpHash);
+        user.setOtpExpiresAt(Instant.now().plus(OTP_EXPIRATION_MINUTES, ChronoUnit.MINUTES));
+        user.setOtpAttempts(0);
+        user.setLastOtpSentAt(Instant.now());
+
+        userRepository.save(user);
+
+        // Send OTP Email
+        emailService.sendOtpEmail(email, otp);
+
+        return "OTP sent to your email";
+    }
+
+    // ------------------ VALIDATE OTP (FOR PASSWORD RESET) ------------------
+    public boolean validateOtp(String email, String otp) {
+        email = email.trim().toLowerCase();
+        User user = userRepository.findByEmail(email).orElse(null);
+
+        if (user == null) return false;
+
+        if (user.getOtpExpiresAt() == null || user.getOtpExpiresAt().isBefore(Instant.now())) {
+            return false;
+        }
+
+        if (user.getOtpAttempts() >= MAX_OTP_ATTEMPTS) {
+            return false;
+        }
+
+        if (!passwordEncoder.matches(otp, user.getOtpHash())) {
+            user.setOtpAttempts(user.getOtpAttempts() + 1);
+            userRepository.save(user);
+            return false;
+        }
+
+        return true;
+    }
+
+    // ------------------ RESET PASSWORD ------------------
+    public String resetPassword(com.pictofold.backend.dto.ResetPasswordRequest request) {
+        String email = request.getEmail().trim().toLowerCase();
+        User user = userRepository.findByEmail(email).orElse(null);
+
+        if (user == null) return "User not found!";
+
+        if (user.getOtpExpiresAt() == null || user.getOtpExpiresAt().isBefore(Instant.now())) {
+            return "OTP expired or invalid!";
+        }
+
+        if (user.getOtpAttempts() >= MAX_OTP_ATTEMPTS) {
+            return "Too many failed attempts. Please request a new OTP.";
+        }
+
+        if (!passwordEncoder.matches(request.getOtp(), user.getOtpHash())) {
+            user.setOtpAttempts(user.getOtpAttempts() + 1);
+            userRepository.save(user);
+            return "Invalid OTP!";
+        }
+
+        // Success - Update Password
+        String hashedPassword = passwordEncoder.encode(request.getNewPassword());
+        user.setPasswordHash(hashedPassword);
+        
+        // Clear OTP
+        user.setOtpHash(null);
+        user.setOtpExpiresAt(null);
+        user.setOtpAttempts(0);
+        
+        // Ensure email is verified if they successfully reset password via OTP (optional but user friendly)
+        if (!user.isEmailVerified()) {
+            user.setEmailVerified(true);
+        }
+
+        userRepository.save(user);
+
+        return "Password reset successfully";
+    }
+
     private String generateOtp() {
         SecureRandom random = new SecureRandom();
         int otp = 100000 + random.nextInt(900000);

@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  .bg-craft-pattern {
+    background-color: #f0f4f8;
+    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  
+  .paper-shadow {
+    box-shadow: 1px 1px 0px 0px rgba(0,0,0,0.1),
+                2px 2px 0px 0px rgba(0,0,0,0.1),
+                3px 3px 0px 0px rgba(0,0,0,0.1),
+                4px 4px 0px 0px rgba(0,0,0,0.1),
+                5px 5px 0px 0px rgba(0,0,0,0.1);
+  }
+
+  .origami-fold {
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
+  }
+}
